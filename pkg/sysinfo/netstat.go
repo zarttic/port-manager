@@ -2,7 +2,6 @@ package sysinfo
 
 import (
 	"fmt"
-	"syscall"
 	"time"
 
 	"github.com/shirou/gopsutil/v3/net"
