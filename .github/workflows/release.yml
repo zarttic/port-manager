@@ -42,21 +42,24 @@ jobs:
       - name: Install Wails
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
-      - name: Build
+      - name: Install frontend dependencies
         run: |
-          cd backend
-          wails build -platform ${{ matrix.platform }}/${{ matrix.arch }}
+          cd frontend
+          npm install
+
+      - name: Build
+        run: wails build -platform ${{ matrix.platform }}/${{ matrix.arch }}
 
       - name: Create artifact (Windows)
         if: matrix.platform == 'windows'
         run: |
-          cd backend/build/bin
+          cd build/bin
           Compress-Archive -Path port-manager.exe -DestinationPath port-manager-${{ matrix.platform }}-${{ matrix.arch }}.zip
 
       - name: Create artifact (Unix)
         if: matrix.platform != 'windows'
         run: |
-          cd backend/build/bin
+          cd build/bin
           tar -czf port-manager-${{ matrix.platform }}-${{ matrix.arch }}.tar.gz port-manager
 
       - name: Upload artifact
@@ -64,7 +67,7 @@ jobs:
         with:
           name: port-manager-${{ matrix.platform }}-${{ matrix.arch }}
           path: |
-            backend/build/bin/port-manager-${{ matrix.platform }}-${{ matrix.arch }}.*
+            build/bin/port-manager-${{ matrix.platform }}-${{ matrix.arch }}.*
 
   release:
     needs: build
