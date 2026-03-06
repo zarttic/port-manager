@@ -2,7 +2,6 @@
   import { onMount } from 'svelte';
   import PortList from './components/PortList/PortList.svelte';
   import StatsChart from './components/StatsChart/StatsChart.svelte';
-  import { ScanPorts } from '../../wailsjs/go/main/App';
 
   let ports: any[] = [];
   let loading = false;
@@ -16,7 +15,12 @@
     loading = true;
     error = '';
     try {
-      ports = await ScanPorts();
+      // Mock data for now - will be replaced with Wails bindings
+      ports = [
+        { port: 80, protocol: 'tcp', state: 'LISTEN', pid: 1234, processName: 'nginx' },
+        { port: 443, protocol: 'tcp', state: 'LISTEN', pid: 1234, processName: 'nginx' },
+        { port: 3000, protocol: 'tcp', state: 'LISTEN', pid: 5678, processName: 'node' },
+      ];
       console.log('Scanned ports:', ports.length);
     } catch (e: any) {
       error = e.message || 'Failed to scan ports';
