@@ -62,8 +62,14 @@ jobs:
           cd build/bin
           Compress-Archive -Path port-manager.exe -DestinationPath port-manager-${{ matrix.platform }}-${{ matrix.arch }}.zip
 
-      - name: Create artifact (Unix)
-        if: matrix.platform != 'windows'
+      - name: Create artifact (macOS)
+        if: matrix.platform == 'darwin'
+        run: |
+          cd build/bin
+          tar -czf port-manager-${{ matrix.platform }}-${{ matrix.arch }}.tar.gz port-manager.app
+
+      - name: Create artifact (Linux)
+        if: matrix.platform == 'linux'
         run: |
           cd build/bin
           tar -czf port-manager-${{ matrix.platform }}-${{ matrix.arch }}.tar.gz port-manager
