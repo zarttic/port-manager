@@ -45,7 +45,7 @@ jobs:
       - name: Install frontend dependencies
         run: |
           cd frontend
-          npm install
+          npm install --legacy-peer-deps
 
       - name: Build
         run: wails build -platform ${{ matrix.platform }}/${{ matrix.arch }}
