@@ -13,15 +13,10 @@ jobs:
           - os: windows-latest
             platform: windows
             arch: amd64
-          - os: macos-latest
-            platform: darwin
-            arch: amd64
-          - os: macos-latest
-            platform: darwin
-            arch: arm64
           - os: ubuntu-latest
             platform: linux
             arch: amd64
+      fail-fast: false
 
     runs-on: ${{ matrix.os }}
 
@@ -62,12 +57,6 @@ jobs:
           cd build/bin
           Compress-Archive -Path port-manager.exe -DestinationPath port-manager-${{ matrix.platform }}-${{ matrix.arch }}.zip
 
-      - name: Create artifact (macOS)
-        if: matrix.platform == 'darwin'
-        run: |
-          cd build/bin
-          tar -czf port-manager-${{ matrix.platform }}-${{ matrix.arch }}.tar.gz port-manager.app
-
       - name: Create artifact (Linux)
         if: matrix.platform == 'linux'
         run: |
@@ -84,6 +73,7 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
+    if: always()
 
     steps:
       - name: Checkout code
