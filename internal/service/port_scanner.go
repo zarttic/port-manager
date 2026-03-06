@@ -1,13 +1,9 @@
 package service
 
 import (
-	"context"
-	"log"
 	"sync"
-	"time"
 
 	"port-manager/internal/model"
-	"port-manager/internal/repository"
 	"port-manager/pkg/sysinfo"
 )
 

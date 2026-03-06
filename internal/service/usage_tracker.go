@@ -96,7 +96,6 @@ func (t *UsageTracker) RecordPortUsage(ports []model.PortInfo) {
 		if !found {
 			// Port closed
 			endTime := time.Now()
-			var startUsage model.PortUsage
 
 			// Get start time (simplified - in production, fetch from DB)
 			duration := int64(0)
