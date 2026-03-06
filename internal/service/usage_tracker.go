@@ -124,3 +124,8 @@ func (t *UsageTracker) GetTopUsedPorts(limit int) ([]model.PortStats, error) {
 func (t *UsageTracker) GetUsageHistory(start, end time.Time) ([]model.PortUsage, error) {
 	return t.usageRepo.GetUsageHistory(start, end)
 }
+
+// GetPortHistory gets port usage history
+func (t *UsageTracker) GetPortHistory(port int) ([]model.PortUsage, error) {
+	return t.portRepo.GetByPort(port, 100)
+}
