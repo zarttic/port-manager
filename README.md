@@ -29,7 +29,7 @@ go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
 ```bash
 # 克隆仓库
-git clone https://github.com/yourusername/port-manager.git
+git clone https://github.com/zarttic/port-manager.git
 cd port-manager
 
 # 安装前端依赖
@@ -51,12 +51,11 @@ wails build
 
 ## 📦 下载安装
 
-从 [Releases](https://github.com/yourusername/port-manager/releases) 页面下载适合您系统的版本：
+从 [Releases](https://github.com/zarttic/port-manager/releases) 页面下载适合您系统的版本：
 
-- **Windows**: `port-manager-windows-amd64.zip`
+- **Windows**: `port-manager.exe` (直接运行) 或 `port-manager-windows-amd64.zip`
 - **macOS (Intel)**: `port-manager-darwin-amd64.tar.gz`
-- **macOS (M1/M2)**: `port-manager-darwin-arm64.tar.gz`
-- **Linux**: `port-manager-linux-amd64.tar.gz`
+- **macOS (Apple Silicon)**: `port-manager-darwin-arm64.tar.gz`
 
 ## 🏗️ 项目结构
 
