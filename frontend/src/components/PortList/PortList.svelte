@@ -1,11 +1,18 @@
 <script lang="ts">
   import { fly, fade } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
-  import ProcessCard from '../ProcessCard/ProcessCard.svelte';
 
   export let ports: any[];
+  export let onKillProcess: (pid: number) => Promise<void>;
 
   $: filteredPorts = ports.sort((a, b) => a.port - b.port);
+
+  async function handleKillClick(pid: number, event: Event) {
+    event.stopPropagation();
+    if (confirm(`确定要杀死 PID ${pid} 的进程吗？`)) {
+      await onKillProcess(pid);
+    }
+  }
 </script>
 
 <div class="max-h-[600px] overflow-y-auto custom-scrollbar">
@@ -39,6 +46,7 @@
 
           <div class="flex items-center space-x-2">
             <button
+              on:click={(e) => handleKillClick(port.pid, e)}
               class="px-3 py-1 text-sm bg-red-900/20 hover:bg-red-900/40 text-red-400 rounded transition-colors duration-200"
             >
               杀死进程

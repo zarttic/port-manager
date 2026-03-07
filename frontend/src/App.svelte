@@ -1,32 +1,67 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import PortList from './components/PortList/PortList.svelte';
   import StatsChart from './components/StatsChart/StatsChart.svelte';
+  import { ScanPorts, KillProcess, GetPortStats, GetTopUsedPorts } from '../wailsjs/go/main/App';
 
   let ports: any[] = [];
   let loading = false;
   let error = '';
+  let stats: any = null;
+  let selectedPort: any = null;
+  let autoRefresh = false;
+  let refreshInterval: number;
 
   onMount(async () => {
     await scanPorts();
+    await loadStats();
+  });
+
+  onDestroy(() => {
+    if (refreshInterval) {
+      clearInterval(refreshInterval);
+    }
   });
 
   async function scanPorts() {
     loading = true;
     error = '';
     try {
-      // Mock data for now - will be replaced with Wails bindings
-      ports = [
-        { port: 80, protocol: 'tcp', state: 'LISTEN', pid: 1234, processName: 'nginx' },
-        { port: 443, protocol: 'tcp', state: 'LISTEN', pid: 1234, processName: 'nginx' },
-        { port: 3000, protocol: 'tcp', state: 'LISTEN', pid: 5678, processName: 'node' },
-      ];
+      ports = await ScanPorts();
       console.log('Scanned ports:', ports.length);
     } catch (e: any) {
       error = e.message || 'Failed to scan ports';
       console.error('Scan error:', e);
     } finally {
       loading = false;
+    }
+  }
+
+  async function handleKillProcess(pid: number) {
+    try {
+      await KillProcess(pid);
+      // Refresh the port list
+      await scanPorts();
+    } catch (e: any) {
+      error = e.message || 'Failed to kill process';
+      console.error('Kill process error:', e);
+    }
+  }
+
+  async function loadStats() {
+    try {
+      stats = await GetTopUsedPorts(10);
+    } catch (e: any) {
+      console.error('Stats error:', e);
+    }
+  }
+
+  function toggleAutoRefresh() {
+    autoRefresh = !autoRefresh;
+    if (autoRefresh) {
+      refreshInterval = setInterval(scanPorts, 5000);
+    } else {
+      clearInterval(refreshInterval);
     }
   }
 </script>
@@ -43,13 +78,22 @@
           <p class="text-sm text-dark-400 mt-1">端口管理工具</p>
         </div>
 
-        <button
-          on:click={scanPorts}
-          disabled={loading}
-          class="px-6 py-2 bg-primary-600 hover:bg-primary-700 disabled:bg-dark-600 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 active:scale-95"
-        >
-          {loading ? '扫描中...' : '扫描端口'}
-        </button>
+        <div class="flex items-center space-x-3">
+          <button
+            on:click={toggleAutoRefresh}
+            class="px-4 py-2 {autoRefresh ? 'bg-green-600 hover:bg-green-700' : 'bg-dark-700 hover:bg-dark-600'} rounded-lg font-medium transition-all duration-200"
+          >
+            {autoRefresh ? '🔄 自动刷新中' : '⏸️ 自动刷新'}
+          </button>
+
+          <button
+            on:click={scanPorts}
+            disabled={loading}
+            class="px-6 py-2 bg-primary-600 hover:bg-primary-700 disabled:bg-dark-600 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 active:scale-95"
+          >
+            {loading ? '扫描中...' : '🔍 扫描端口'}
+          </button>
+        </div>
       </div>
     </div>
   </header>
@@ -77,7 +121,7 @@
               <p class="mt-2 text-dark-400">扫描中...</p>
             </div>
           {:else if ports.length > 0}
-            <PortList {ports} />
+            <PortList {ports} onKillProcess={handleKillProcess} />
           {:else}
             <div class="p-8 text-center text-dark-400">
               点击"扫描端口"开始扫描

@@ -2,7 +2,8 @@
   import { onMount } from 'svelte';
   import * as echarts from 'echarts';
 
-  export let ports: any[];
+  export let ports: any[] = [];
+  export let stats: any[] = [];
 
   let chartContainer: HTMLDivElement;
   let chart: echarts.ECharts;
@@ -16,6 +17,8 @@
     acc[port.state] = (acc[port.state] || 0) + 1;
     return acc;
   }, {});
+
+  $: processCount = new Set(ports.map(p => p.pid)).size;
 
   onMount(() => {
     chart = echarts.init(chartContainer, 'dark');
@@ -124,10 +127,24 @@
       <div>
         <div class="text-sm text-dark-400">活跃进程</div>
         <div class="text-xl font-semibold text-purple-400">
-          {new Set(ports.map(p => p.pid)).size}
+          {processCount}
         </div>
       </div>
       <div class="text-2xl">⚡</div>
     </div>
+
+    {#if stats && stats.length > 0}
+      <div class="mt-4 p-4 bg-dark-700/30 rounded-lg">
+        <h3 class="text-sm font-semibold text-dark-300 mb-2">Top 使用端口</h3>
+        <div class="space-y-2">
+          {#each stats.slice(0, 5) as stat}
+            <div class="flex justify-between items-center text-sm">
+              <span class="text-primary-400 font-mono">:{stat.port}</span>
+              <span class="text-dark-400">{stat.usageCount || 0} 次</span>
+            </div>
+          {/each}
+        </div>
+      </div>
+    {/if}
   </div>
 </div>
